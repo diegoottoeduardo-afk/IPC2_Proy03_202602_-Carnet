@@ -1,0 +1,81 @@
+@page
+@model DteFrontend.Pages.Ayuda.DocumentacionModel
+@{
+    ViewData["Title"] = "Documentación del Programa";
+}
+
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-bottom py-3">
+                <h4 class="mb-0 text-primary fw-bold">📖 Documentación del Sistema DTE - SAT</h4>
+                <p class="text-muted small mb-0">Guía de usuario, arquitectura y especificación técnica de la solución desarrollada.</p>
+            </div>
+            <div class="card-body p-4">
+                <h5 class="fw-bold text-dark border-bottom pb-2">1. Arquitectura General de la Solución</h5>
+                <p>
+                    La solución está estructurada en dos aplicaciones desacopladas que se comunican mediante HTTP utilizando mensajes en formato JSON:
+                </p>
+                <ul>
+                    <li><strong>Programa 1 (Frontend):</strong> Aplicación Web interactiva desarrollada en ASP.NET Core Razor Pages con Bootstrap 5 para el envío de mensajes, visualización de respuestas, reportes y administración.</li>
+                    <li><strong>Servicio 2 (Backend):</strong> API REST construida en ASP.NET Core Web API encargada de procesar las solicitudes, validar NITs mediante algoritmo Módulo 11, auditar cálculos tributarios y persistir la información en archivos JSON (<code>rtu.json</code> y <code>facturas.json</code>).</li>
+                </ul>
+
+                <h5 class="fw-bold text-dark border-bottom pb-2 mt-4">2. Algoritmo de Validación de NIT (Módulo 11)</h5>
+                <p>Para comprobar la validez de los NITs ingresados se ejecuta el siguiente procedimiento:</p>
+                <ol>
+                    <li>Se separa el último carácter correspondiente al dígito verificador.</li>
+                    <li>Se multiplica cada dígito de la base de derecha a izquierda por factores sucesivos iniciando en 1 (o posición respectiva).</li>
+                    <li>Se suman todos los productos obtenidos.</li>
+                    <li>Se calcula el residuo (módulo 11) de la sumatoria.</li>
+                    <li>A 11 se le resta el residuo anterior: <code>11 - modulo</code>.</li>
+                    <li>Se obtiene el módulo 11 del resultado anterior. Si el resultado es <code>10</code>, el dígito verificador debe ser <code>K</code>; en caso contrario, coincide con el número obtenido (0 al 9).</li>
+                </ol>
+
+                <h5 class="fw-bold text-dark border-bottom pb-2 mt-4">3. Reglas de Validación de Facturas (DTE)</h5>
+                <ul>
+                    <li><strong>FECHA:</strong> Se extrae con expresiones regulares en formato <code>dd/mm/yyyy hh24:mi</code>, omitiendo textos adicionales como departamentos o palabras accesorias.</li>
+                    <li><strong>REFERENCIA:</strong> Código alfanumérico único por factura de hasta 40 posiciones.</li>
+                    <li><strong>NIT EMISOR y RECEPTOR:</strong> Ambos deben ser válidos algorítmicamente y además existir previamente en el Registro Tributario Unificado (RTU).</li>
+                    <li><strong>CÁLCULO DEL IVA:</strong> El IVA debe coincidir exactamente con <code>REDONDEAR(VALOR * 0.12, 2)</code>.</li>
+                    <li><strong>CÁLCULO DEL TOTAL:</strong> El Total debe ser <code>VALOR + IVA</code>.</li>
+                    <li><strong>NÚMERO DE AUTORIZACIÓN:</strong> Aprobada la factura, se genera un correlativo único diario con estructura <code>yyyymmdd########</code> (16 dígitos).</li>
+                </ul>
+
+                <h5 class="fw-bold text-dark border-bottom pb-2 mt-4">4. Endpoints Expuestos por el Backend</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Método</th>
+                                <th>Ruta</th>
+                                <th>Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge bg-success">POST</span></td>
+                                <td><code>/api/Rtu/actualizar</code></td>
+                                <td>Registra y actualiza contribuyentes en el RTU.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-success">POST</span></td>
+                                <td><code>/api/Autorizaciones/procesar</code></td>
+                                <td>Valida, autoriza y almacena facturas electrónicas DTE.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-danger">POST</span></td>
+                                <td><code>/api/Sistema/inicializar</code></td>
+                                <td>Limpia la base de datos y archivos persistentes a su estado inicial.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a asp-page="/Index" class="btn btn-primary px-4">Ir a Enviar Mensajes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

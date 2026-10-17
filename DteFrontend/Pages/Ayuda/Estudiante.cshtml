@@ -1,0 +1,49 @@
+@page
+@model DteFrontend.Pages.Ayuda.EstudianteModel
+@{
+    ViewData["Title"] = "Información del Estudiante";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="mb-0 fw-bold">🎓 Información del Desarrollador</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <div class="display-3 text-primary mb-2">👤</div>
+                    <h3 class="fw-bold text-dark">@Model.NombreCompleto</h3>
+                    <span class="badge bg-secondary fs-6">Carnet: @Model.Carnet</span>
+                </div>
+
+                <div class="list-group list-group-flush border-top border-bottom my-3">
+                    <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                        <span class="fw-bold text-muted">Universidad:</span>
+                        <span class="fw-semibold">@Model.Universidad</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                        <span class="fw-bold text-muted">Facultad:</span>
+                        <span class="fw-semibold">@Model.Facultad</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                        <span class="fw-bold text-muted">Escuela / Carrera:</span>
+                        <span class="fw-semibold">@Model.Carrera</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                        <span class="fw-bold text-muted">Curso:</span>
+                        <span class="fw-semibold">@Model.Curso</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                        <span class="fw-bold text-muted">Período Académico:</span>
+                        <span class="fw-semibold">@Model.Semestre</span>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a asp-page="/Index" class="btn btn-outline-primary px-4">Volver al Inicio</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

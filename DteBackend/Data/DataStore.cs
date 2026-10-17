@@ -1,4 +1,4 @@
-﻿using DteBackend.Models;
+using DteBackend.Models;
 using System.Text.Json;
 
 namespace DteBackend.Data
@@ -20,14 +20,28 @@ namespace DteBackend.Data
         {
             if (File.Exists(archivoRtu))
             {
-                string json = File.ReadAllText(archivoRtu);
-                Contribuyentes = JsonSerializer.Deserialize<List<Contribuyente>>(json) ?? new List<Contribuyente>();
+                try
+                {
+                    string json = File.ReadAllText(archivoRtu);
+                    Contribuyentes = JsonSerializer.Deserialize<List<Contribuyente>>(json) ?? new List<Contribuyente>();
+                }
+                catch
+                {
+                    Contribuyentes = new List<Contribuyente>();
+                }
             }
 
             if (File.Exists(archivoFacturas))
             {
-                string json = File.ReadAllText(archivoFacturas);
-                Facturas = JsonSerializer.Deserialize<List<FacturaGuardada>>(json) ?? new List<FacturaGuardada>();
+                try
+                {
+                    string json = File.ReadAllText(archivoFacturas);
+                    Facturas = JsonSerializer.Deserialize<List<FacturaGuardada>>(json) ?? new List<FacturaGuardada>();
+                }
+                catch
+                {
+                    Facturas = new List<FacturaGuardada>();
+                }
             }
         }
 

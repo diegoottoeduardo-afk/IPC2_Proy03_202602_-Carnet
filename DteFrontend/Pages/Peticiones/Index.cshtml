@@ -1,0 +1,35 @@
+@page
+@model DteFrontend.Pages.Peticiones.IndexModel
+@{
+    ViewData["Title"] = "Peticiones y Reportes";
+}
+
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-bottom py-3">
+                <h4 class="mb-0 text-primary fw-bold">📊 Módulo de Peticiones y Consultas</h4>
+                <p class="text-muted small mb-0">Consultas estadísticas, resúmenes de IVA, rangos de fechas, gráficas y generación de PDF.</p>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info border-0 shadow-sm mb-4">
+                    <h5 class="alert-heading fw-bold">🚀 Próximamente en el Release 4</h5>
+                    <p class="mb-0">
+                        Este módulo abarcará las opciones de reportería estadística del sistema:
+                    </p>
+                    <ul class="mt-2 mb-0">
+                        <li><strong>Consultar Contribuyente:</strong> Facturas emitidas o recibidas en un rango de fechas con montos totales.</li>
+                        <li><strong>Resumen de IVA por fecha y NIT:</strong> Detalle de IVA emitido e IVA recibido para cada contribuyente.</li>
+                        <li><strong>Resumen por rango de fechas:</strong> Montos totales o valores sin IVA agrupados por día.</li>
+                        <li><strong>Gráficas Interactivas:</strong> Representación visual de los resúmenes anteriores mediante Chart.js.</li>
+                        <li><strong>Reporte en PDF:</strong> Descarga consolidada de todos los informes en formato de documento portable.</li>
+                    </ul>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a asp-page="/Index" class="btn btn-outline-primary px-4">Ir a Enviar Mensaje</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

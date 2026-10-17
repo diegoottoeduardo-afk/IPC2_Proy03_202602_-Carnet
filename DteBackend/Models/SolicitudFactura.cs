@@ -1,4 +1,4 @@
-﻿namespace DteBackend.Models
+namespace DteBackend.Models
 {
     public class SolicitudFactura
     {

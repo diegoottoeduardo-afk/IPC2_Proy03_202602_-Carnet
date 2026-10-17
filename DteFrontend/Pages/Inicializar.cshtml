@@ -1,0 +1,42 @@
+@page
+@model InicializarModel
+@{
+    ViewData["Title"] = "Inicializar Sistema";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 border-top border-warning border-4">
+            <div class="card-header bg-white py-3">
+                <h4 class="mb-0 text-warning fw-bold">⚠️ Inicializar Sistema</h4>
+            </div>
+            <div class="card-body p-4 text-center">
+                <div class="display-1 text-warning mb-3">🔄</div>
+                <h5 class="fw-bold">¿Deseas devolver el sistema al estado inicial?</h5>
+                <p class="text-muted">
+                    Esta acción enviará una solicitud a la API para borrar todos los contribuyentes registrados en el RTU 
+                    y todas las facturas procesadas. Los archivos de datos quedarán vacíos.
+                </p>
+
+                @if (!string.IsNullOrEmpty(Model.MensajeExito))
+                {
+                    <div class="alert alert-success alert-dismissible fade show text-start" role="alert">
+                        <strong>✅ Completado:</strong> @Model.MensajeExito
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.MensajeError))
+                {
+                    <div class="alert alert-danger alert-dismissible fade show text-start" role="alert">
+                        <strong>❌ Error:</strong> @Model.MensajeError
+                    </div>
+                }
+
+                <form method="post" class="mt-4">
+                    <a asp-page="/Index" class="btn btn-outline-secondary px-4 me-2">Cancelar y Volver</a>
+                    <button type="submit" class="btn btn-danger px-4 fw-bold">Confirmar e Inicializar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

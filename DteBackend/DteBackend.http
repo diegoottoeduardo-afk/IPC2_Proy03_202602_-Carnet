@@ -1,4 +1,4 @@
-@DteBackend_HostAddress = http://localhost:5031
+@DteBackend_HostAddress = http://localhost:5025
 
 GET {{DteBackend_HostAddress}}/weatherforecast/
 Accept: application/json

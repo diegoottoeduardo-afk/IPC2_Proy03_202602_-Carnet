@@ -1,50 +1,53 @@
-﻿using System.Text.RegularExpressions;
-
 namespace DteBackend.Utils
 {
     public static class NitValidator
     {
         public static bool EsNitValido(string nit)
         {
-            if (string.IsNullOrWhiteSpace(nit)) return false;
+            if (string.IsNullOrWhiteSpace(nit))
+                return false;
 
-            // Extraer usando expresión regular: letras, números o guiones.
-            // Para la validación, quitaremos guiones si los tiene y lo pasamos a mayúsculas
-            nit = Regex.Replace(nit.ToUpper(), "[^0-9A-Z]", "");
+            nit = nit.Trim().ToUpper();
 
-            if (nit.Length < 2 || nit.Length > 20) return false;
+            if (nit.Length < 2 || nit.Length > 20)
+                return false;
 
-            // El último carácter es el dígito verificador
             char digitoVerificador = nit[nit.Length - 1];
-            string numeroBase = nit.Substring(0, nit.Length - 1);
+            string baseNit = nit.Substring(0, nit.Length - 1);
 
             int suma = 0;
-            // Multiplicar cada carácter por su posición de derecha a izquierda (iniciando en 2 para el cálculo real)
-            // Según el PDF: Posición 1 es el dígito verificador (que omitimos en la suma). 
-            // Así que las posiciones a multiplicar son 2, 3, 4... etc.
-            int posicion = 2;
+            int posicion = 1;
 
-            for (int i = numeroBase.Length - 1; i >= 0; i--)
+            for (int i = baseNit.Length - 1; i >= 0; i--)
             {
-                if (!char.IsDigit(numeroBase[i])) return false; // La base deben ser puros números
+                if (!char.IsDigit(baseNit[i]))
+                    return false;
 
-                int valor = int.Parse(numeroBase[i].ToString());
-                suma += (valor * posicion);
+                int digito = int.Parse(baseNit[i].ToString());
+                suma += digito * posicion;
                 posicion++;
             }
 
+            // Paso 3: Módulo 11 de la sumatoria
             int modulo = suma % 11;
-            int resultado = 11 - modulo;
 
-            // Si el resultado es 11, suele usarse 0. Si es 10, es K.
-            char verificadorEsperado = resultado switch
+            // Paso 4: A 11 réstale el resultado del paso 3
+            int resta = 11 - modulo;
+
+            // Paso 5: Módulo 11 del resultado del paso 4
+            int resultado = resta % 11;
+
+            char esperado;
+            if (resultado == 10)
             {
-                10 => 'K',
-                11 => '0',
-                _ => resultado.ToString()[0]
-            };
+                esperado = 'K';
+            }
+            else
+            {
+                esperado = resultado.ToString()[0];
+            }
 
-            return digitoVerificador == verificadorEsperado;
+            return digitoVerificador == esperado;
         }
     }
 }
