@@ -5,29 +5,53 @@
 }
 
 <div class="row">
-    <div class="col-lg-10 mx-auto">
+    <div class="col-lg-12">
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-header bg-white border-bottom py-3">
-                <h4 class="mb-0 text-primary fw-bold">📊 Módulo de Peticiones y Consultas</h4>
-                <p class="text-muted small mb-0">Consultas estadísticas, resúmenes de IVA, rangos de fechas, gráficas y generación de PDF.</p>
+                <h4 class="mb-0 text-primary fw-bold">Módulo de Peticiones y Consultas</h4>
+                <p class="text-muted small mb-0">Selecciona cualquiera de las opciones de reportería y análisis disponibles en el sistema.</p>
             </div>
             <div class="card-body p-4">
-                <div class="alert alert-info border-0 shadow-sm mb-4">
-                    <h5 class="alert-heading fw-bold">🚀 Próximamente en el Release 4</h5>
-                    <p class="mb-0">
-                        Este módulo abarcará las opciones de reportería estadística del sistema:
-                    </p>
-                    <ul class="mt-2 mb-0">
-                        <li><strong>Consultar Contribuyente:</strong> Facturas emitidas o recibidas en un rango de fechas con montos totales.</li>
-                        <li><strong>Resumen de IVA por fecha y NIT:</strong> Detalle de IVA emitido e IVA recibido para cada contribuyente.</li>
-                        <li><strong>Resumen por rango de fechas:</strong> Montos totales o valores sin IVA agrupados por día.</li>
-                        <li><strong>Gráficas Interactivas:</strong> Representación visual de los resúmenes anteriores mediante Chart.js.</li>
-                        <li><strong>Reporte en PDF:</strong> Descarga consolidada de todos los informes en formato de documento portable.</li>
-                    </ul>
-                </div>
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-0 border-top border-primary border-4 p-3">
+                            <h5 class="fw-bold text-dark">Consultar Contribuyente</h5>
+                            <p class="text-muted small flex-grow-1">Consulta facturas emitidas o recibidas por un NIT en un rango de fechas con desglose diario.</p>
+                            <a asp-page="/Peticiones/ConsultarContribuyente" class="btn btn-outline-primary fw-semibold">Acceder</a>
+                        </div>
+                    </div>
 
-                <div class="text-center mt-4">
-                    <a asp-page="/Index" class="btn btn-outline-primary px-4">Ir a Enviar Mensaje</a>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-0 border-top border-success border-4 p-3">
+                            <h5 class="fw-bold text-dark">Resumen de IVA</h5>
+                            <p class="text-muted small flex-grow-1">Detalle de movimientos tributarios por fecha, mostrando el IVA emitido y recibido por cada NIT.</p>
+                            <a asp-page="/Peticiones/ResumenIva" class="btn btn-outline-success fw-semibold">Acceder</a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-0 border-top border-info border-4 p-3">
+                            <h5 class="fw-bold text-dark">Resumen por Rango</h5>
+                            <p class="text-muted small flex-grow-1">Totales autorizados agrupados por fecha, con opción de valores totales con IVA o sin IVA.</p>
+                            <a asp-page="/Peticiones/ResumenRango" class="btn btn-outline-info fw-semibold">Acceder</a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-6">
+                        <div class="card h-100 shadow-sm border-0 border-top border-warning border-4 p-3">
+                            <h5 class="fw-bold text-dark">Gráficas Estadísticas</h5>
+                            <p class="text-muted small flex-grow-1">Gráfica comparativa de IVA por NIT y evolución de valores autorizados en el tiempo con Chart.js.</p>
+                            <a asp-page="/Peticiones/Graficas" class="btn btn-outline-warning text-dark fw-semibold">Ver Gráficas</a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-6">
+                        <div class="card h-100 shadow-sm border-0 border-top border-danger border-4 p-3">
+                            <h5 class="fw-bold text-dark">Reporte en PDF</h5>
+                            <p class="text-muted small flex-grow-1">Descarga el reporte consolidado en archivo PDF generado por la API o imprímelo directamente.</p>
+                            <a asp-page="/Peticiones/ReportePdf" class="btn btn-outline-danger fw-semibold">Generar PDF</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,0 +1,148 @@
+@page
+@model DteFrontend.Pages.Peticiones.GraficasModel
+@{
+    ViewData["Title"] = "Gráficas Estadísticas";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-bottom py-3">
+                <h4 class="mb-0 text-primary fw-bold">📈 Gráficas Estadísticas del Sistema</h4>
+                <p class="text-muted small mb-0">Visualización gráfica interactiva para el Resumen de IVA por NIT y para el Resumen por Rango de Fechas.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráfica 1: Resumen de IVA por NIT -->
+<div class="row mb-5">
+    <div class="col-lg-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-dark">1. Gráfica de IVA Emitido vs IVA Recibido por NIT</h5>
+                <form method="get" class="d-flex gap-2 align-items-center">
+                    <input type="hidden" name="fechaInicioRango" value="@Model.FechaInicioRango" />
+                    <input type="hidden" name="fechaFinRango" value="@Model.FechaFinRango" />
+                    <input type="hidden" name="conIva" value="@(Model.ConIva.ToString().ToLower())" />
+                    <label class="form-label mb-0 small fw-bold">Fecha:</label>
+                    <input type="date" name="fechaIva" value="@Model.FechaIva" class="form-control form-control-sm" />
+                    <button type="submit" class="btn btn-sm btn-primary">Actualizar</button>
+                </form>
+            </div>
+            <div class="card-body p-4">
+                <div style="position: relative; height: 350px;">
+                    <canvas id="chartIva"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráfica 2: Resumen por Rango de Fechas -->
+<div class="row mb-5">
+    <div class="col-lg-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <h5 class="mb-0 fw-bold text-dark">2. Gráfica de Valores Autorizados por Rango de Fechas</h5>
+                <form method="get" class="d-flex flex-wrap gap-2 align-items-center">
+                    <input type="hidden" name="fechaIva" value="@Model.FechaIva" />
+                    <label class="form-label mb-0 small fw-bold">Desde:</label>
+                    <input type="date" name="fechaInicioRango" value="@Model.FechaInicioRango" class="form-control form-control-sm" />
+                    <label class="form-label mb-0 small fw-bold">Hasta:</label>
+                    <input type="date" name="fechaFinRango" value="@Model.FechaFinRango" class="form-control form-control-sm" />
+                    <select name="conIva" class="form-select form-select-sm">
+                        <option value="true" selected="@(Model.ConIva)">Total con IVA</option>
+                        <option value="false" selected="@(!Model.ConIva)">Sin IVA</option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-primary">Actualizar</button>
+                </form>
+            </div>
+            <div class="card-body p-4">
+                <div style="position: relative; height: 350px;">
+                    <canvas id="chartRango"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Datos Gráfica 1
+        const labelsIva = @Html.Raw(Model.LabelsIvaJson);
+        const dataIvaEmitido = @Html.Raw(Model.DataIvaEmitidoJson);
+        const dataIvaRecibido = @Html.Raw(Model.DataIvaRecibidoJson);
+
+        const ctxIva = document.getElementById('chartIva').getContext('2d');
+        new Chart(ctxIva, {
+            type: 'bar',
+            data: {
+                labels: labelsIva.length > 0 ? labelsIva : ['Sin datos'],
+                datasets: [
+                    {
+                        label: 'IVA Emitido (Q)',
+                        data: dataIvaEmitido.length > 0 ? dataIvaEmitido : [0],
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'IVA Recibido (Q)',
+                        data: dataIvaRecibido.length > 0 ? dataIvaRecibido : [0],
+                        backgroundColor: 'rgba(255, 159, 64, 0.7)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) { return 'Q ' + value; }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Datos Gráfica 2
+        const labelsRango = @Html.Raw(Model.LabelsRangoJson);
+        const dataValoresRango = @Html.Raw(Model.DataValoresRangoJson);
+
+        const ctxRango = document.getElementById('chartRango').getContext('2d');
+        new Chart(ctxRango, {
+            type: 'line',
+            data: {
+                labels: labelsRango.length > 0 ? labelsRango : ['Sin datos'],
+                datasets: [{
+                    label: 'Valor Autorizado (Q)',
+                    data: dataValoresRango.length > 0 ? dataValoresRango : [0],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.2,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) { return 'Q ' + value; }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

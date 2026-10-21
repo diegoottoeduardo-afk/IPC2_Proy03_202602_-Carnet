@@ -1,0 +1,122 @@
+@page
+@model DteFrontend.Pages.Peticiones.ResumenRangoModel
+@{
+    ViewData["Title"] = "Resumen por Rango de Fechas";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-bottom py-3">
+                <h4 class="mb-0 text-primary fw-bold">📅 Resumen por Rango de Fechas</h4>
+                <p class="text-muted small mb-0">Consulta el total autorizado agrupado por fecha, pudiendo seleccionar valores totales o valores sin IVA.</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="fechaInicio" class="form-label fw-bold">Fecha Inicio:</label>
+                        <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" value="@Model.FechaInicio">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="fechaFin" class="form-label fw-bold">Fecha Fin:</label>
+                        <input type="date" class="form-control" id="fechaFin" name="fechaFin" value="@Model.FechaFin">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Modalidad de Valor:</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="conIva" id="conIvaTrue" value="true" checked="@(Model.ConIva)">
+                                <label class="form-check-label" for="conIvaTrue">Valores Totales (con IVA)</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="conIva" id="conIvaFalse" value="false" checked="@(!Model.ConIva)">
+                                <label class="form-check-label" for="conIvaFalse">Valores sin IVA</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn btn-primary px-4 fw-bold">Filtrar Rango</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.MensajeError))
+{
+    <div class="alert alert-danger" role="alert">
+        <strong>Error:</strong> @Model.MensajeError
+    </div>
+}
+
+@if (Model.HayBusqueda)
+{
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 bg-secondary text-white p-3 text-center">
+                <h6 class="mb-1 text-uppercase">Modalidad Seleccionada</h6>
+                <h4 class="fw-bold mb-0">@Model.ModoTexto</h4>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 bg-success text-white p-3 text-center">
+                <h6 class="mb-1 text-uppercase">Total Acumulado en el Rango</h6>
+                <h2 class="fw-bold mb-0">Q @Model.TotalAcumulado.ToString("N2")</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold text-dark">
+                Detalle Diario de Valores Autorizados
+            </h5>
+            <span class="badge bg-secondary">@Model.DetallePorFecha.Count fecha(s)</span>
+        </div>
+        <div class="card-body p-4">
+            @if (Model.DetallePorFecha.Count == 0)
+            {
+                <div class="text-center py-4 text-muted">
+                    No se encontraron facturas autorizadas en el rango de fechas seleccionado.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle border">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>#</th>
+                                <th>Fecha</th>
+                                <th class="text-center">Cantidad de Facturas Autorizadas</th>
+                                <th class="text-end">Valor Autorizado (@(Model.ConIva ? "Total con IVA" : "Sin IVA"))</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.DetallePorFecha.Count; i++)
+                            {
+                                var item = Model.DetallePorFecha[i];
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td><code>@item.Fecha</code></td>
+                                    <td class="text-center"><span class="badge bg-info text-dark">@item.CantidadFacturas</span></td>
+                                    <td class="text-end fw-bold text-success">Q @item.ValorAutorizado.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="table-light fw-bold">
+                            <tr>
+                                <td colspan="3" class="text-end">TOTAL ACUMULADO:</td>
+                                <td class="text-end text-success fs-5">Q @Model.TotalAcumulado.ToString("N2")</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+}
