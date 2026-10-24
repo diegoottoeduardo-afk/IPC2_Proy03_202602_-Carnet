@@ -6,10 +6,30 @@
 
 <div class="row">
     <div class="col-lg-10 mx-auto">
+        <!-- Banner de Descarga Oficial de Documentación Técnica en PDF -->
+        <div class="card shadow-sm border-0 border-top border-danger border-4 mb-4">
+            <div class="card-body p-4 d-flex flex-wrap justify-content-between align-items-center gap-3 bg-white">
+                <div>
+                    <h5 class="fw-bold text-dark mb-1"> Documentación Técnica Oficial (PDF)</h5>
+                    <p class="text-muted small mb-0">
+                        Ensayo técnico formal de 4 a 7 páginas con formato USAC, incluyendo Diagrama de Clases, Diagramas de Actividades y Diagrama de Despliegue.
+                    </p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="~/docs/Documentacion_Tecnica_IPC2_202505251.pdf" target="_blank" class="btn btn-danger fw-bold px-3">
+                         Descargar PDF
+                    </a>
+                    <a href="~/docs/Documentacion_Tecnica_IPC2_202505251.pdf" target="_blank" class="btn btn-outline-secondary fw-semibold px-3">
+                         Ver en Navegador
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-header bg-white border-bottom py-3">
-                <h4 class="mb-0 text-primary fw-bold"> Documentación del Sistema DTE - SAT</h4>
-                <p class="text-muted small mb-0">Guía de usuario, arquitectura y especificación técnica de la solución desarrollada.</p>
+                <h4 class="mb-0 text-primary fw-bold"> Especificación del Sistema DTE - SAT</h4>
+                <p class="text-muted small mb-0">Resumen de usuario, arquitectura y detalle técnico de la solución desarrollada.</p>
             </div>
             <div class="card-body p-4">
                 <h5 class="fw-bold text-dark border-bottom pb-2">1. Arquitectura General de la Solución</h5>
@@ -64,6 +84,21 @@
                                 <td>Valida, autoriza y almacena facturas electrónicas DTE.</td>
                             </tr>
                             <tr>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><code>/api/Reportes/consultadatos</code></td>
+                                <td>Consulta de facturas emitidas o recibidas por NIT en rango de fechas.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><code>/api/Reportes/resumeniva</code></td>
+                                <td>Resumen de IVA emitido y recibido por NIT para una fecha.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><code>/api/Reportes/resumenrango</code></td>
+                                <td>Resumen de valores autorizados en rango de fechas (total o sin IVA).</td>
+                            </tr>
+                            <tr>
                                 <td><span class="badge bg-danger">POST</span></td>
                                 <td><code>/api/Sistema/inicializar</code></td>
                                 <td>Limpia la base de datos y archivos persistentes a su estado inicial.</td>
@@ -72,8 +107,9 @@
                     </table>
                 </div>
 
-                <div class="text-center mt-4">
-                    <a asp-page="/Index" class="btn btn-primary px-4">Ir a Enviar Mensajes</a>
+                <div class="text-center mt-4 d-flex justify-content-center gap-3">
+                    <a asp-page="/Index" class="btn btn-outline-primary px-4">Ir a Enviar Mensajes</a>
+                    <a href="~/docs/Documentacion_Tecnica_IPC2_202505251.pdf" target="_blank" class="btn btn-danger px-4 fw-bold">Descargar Ensayo Técnico (PDF)</a>
                 </div>
             </div>
         </div>

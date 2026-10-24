@@ -36,24 +36,18 @@ namespace DteBackend.Controllers
                     fFin = fFin.Date.AddDays(1).AddTicks(-1);
             }
 
-            // Filtrar facturas aprobadas
             var query = DataStore.Facturas.Where(f => f.Aprobada);
 
             if (tipo == "recibidas")
-            {
                 query = query.Where(f => f.NitReceptor == nit.Trim());
-            }
             else
-            {
                 query = query.Where(f => f.NitEmisor == nit.Trim());
-            }
 
             var facturasFiltradas = query
                 .Where(f => f.Fecha >= fInicio && f.Fecha <= fFin)
                 .OrderBy(f => f.Fecha)
                 .ToList();
 
-            // Agrupar por fecha (dd/MM/yyyy)
             var gruposPorFecha = facturasFiltradas
                 .GroupBy(f => f.Fecha.Date)
                 .Select(g => new
@@ -106,7 +100,6 @@ namespace DteBackend.Controllers
                 .Where(f => f.Aprobada && f.Fecha.Date == fechaFiltro.Date)
                 .ToList();
 
-            // Obtener todos los NITs con movimientos en esa fecha
             var nitsInvolucrados = facturasDelDia
                 .Select(f => f.NitEmisor)
                 .Union(facturasDelDia.Select(f => f.NitReceptor))
@@ -188,7 +181,62 @@ namespace DteBackend.Controllers
             });
         }
 
-        // 4. Reporte en PDF
+        // 4. Reporte detallado por rango de fechas (Página 3 Enunciado & Rúbrica HC)
+        // Total facturas, listado de errores específicos, facturas sin errores, emisores y receptores
+        [HttpGet("/ReporteRango")]
+        [HttpGet("reporteerrores")]
+        public IActionResult ReporteErroresRango(
+            [FromQuery] string fechaInicio, 
+            [FromQuery] string fechaFin)
+        {
+            DateTime fInicio = DateTime.MinValue;
+            DateTime fFin = DateTime.MaxValue;
+
+            if (!string.IsNullOrWhiteSpace(fechaInicio))
+                DateTime.TryParse(fechaInicio, out fInicio);
+
+            if (!string.IsNullOrWhiteSpace(fechaFin))
+            {
+                if (DateTime.TryParse(fechaFin, out fFin))
+                    fFin = fFin.Date.AddDays(1).AddTicks(-1);
+            }
+
+            var facturasRango = DataStore.Facturas
+                .Where(f => f.Fecha >= fInicio && f.Fecha <= fFin)
+                .OrderBy(f => f.Fecha)
+                .ToList();
+
+            var agrupadas = facturasRango
+                .GroupBy(f => f.Fecha.Date)
+                .Select(g => new
+                {
+                    fecha = g.Key.ToString("dd/MM/yyyy"),
+                    cantidadTotalFacturasRecibidas = g.Count(),
+                    listadoErrores = new
+                    {
+                        nitEmisorInvalido = g.Count(f => f.Errores.Contains("NIT emisor inválido")),
+                        nitReceptorInvalido = g.Count(f => f.Errores.Contains("NIT receptor inválido")),
+                        nitEmisorInexistente = g.Count(f => f.Errores.Contains("NIT emisor inexistente")),
+                        nitReceptorInexistente = g.Count(f => f.Errores.Contains("NIT receptor inexistente")),
+                        ivaMalCalculado = g.Count(f => f.Errores.Contains("IVA mal calculado")),
+                        totalMalCalculado = g.Count(f => f.Errores.Contains("TOTAL mal calculado")),
+                        referenciaDuplicada = g.Count(f => f.Errores.Contains("REFERENCIA duplicada"))
+                    },
+                    cantidadFacturasSinErrores = g.Count(f => f.Aprobada),
+                    cantidadEmisoresFacturas = g.Select(f => f.NitEmisor).Distinct().Count(),
+                    cantidadReceptoresFacturas = g.Select(f => f.NitReceptor).Distinct().Count()
+                })
+                .ToList();
+
+            return Ok(new
+            {
+                fechaInicio = fechaInicio ?? "Inicio",
+                fechaFin = fechaFin ?? "Fin",
+                reportePorFecha = agrupadas
+            });
+        }
+
+        // 5. Reporte en PDF
         [HttpGet("pdf")]
         public IActionResult GenerarReportePdf()
         {

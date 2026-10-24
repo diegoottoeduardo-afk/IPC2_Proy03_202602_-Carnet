@@ -1,0 +1,160 @@
+{
+	"info": {
+		"_postman_id": "ipc2-proy3-sat-dte",
+		"name": "Proyecto 3 - SAT DTE (IPC2 2026)",
+		"description": "Colección oficial con las 5 solicitudes indispensables solicitadas por cátedra.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Reinicio / Reset del Sistema",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/Sistema/inicializar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"Sistema",
+						"inicializar"
+					]
+				},
+				"description": "Devuelve el sistema a su estado inicial en memoria y disco."
+			},
+			"response": []
+		},
+		{
+			"name": "2. Carga masiva / Actualización de RTU",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n  {\"NIT\": \"7378106\", \"nombre\": \"Empresa ABC, S.A.\"},\n  {\"NIT\": \"8338817\", \"nombre\": \"Comercial XYZ, S.A.\"},\n  {\"NIT\": \"5123453\", \"nombre\": \"Servicios Integrales del Norte\"},\n  {\"NIT\": \"1000004\", \"nombre\": \"Papelera Central\"},\n  {\"NIT\": \"999999K\", \"nombre\": \"Distribuidora El Quetzal\"},\n  {\"NIT\": \"1234560\", \"nombre\": \"Ferretería La Esquina\"},\n  {\"NIT\": \"4509870\", \"nombre\": \"Inversiones Morales, S.A.\"},\n  {\"NIT\": \"7777779\", \"nombre\": \"Logística Chapina, S.A.\"}\n]"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/Rtu/actualizar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"Rtu",
+						"actualizar"
+					]
+				},
+				"description": "Registra contribuyentes nuevos, actualiza existentes y descarta NITs con error de módulo 11."
+			},
+			"response": []
+		},
+		{
+			"name": "3. Procesamiento de facturas válidas",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n  {\n    \"TIEMPO\": \"Guatemala, 01/04/2025 10:00 hrs.\",\n    \"REFERENCIA\": \"FAC-VAL-001\",\n    \"NIT_EMISOR\": \"7378106\",\n    \"NIT_RECEPTOR\": \"8338817\",\n    \"VALOR\": 100.00,\n    \"IVA\": 12.00,\n    \"TOTAL\": 112.00\n  },\n  {\n    \"TIEMPO\": \"Guatemala, 01/04/2025 10:15 hrs.\",\n    \"REFERENCIA\": \"FAC-VAL-002\",\n    \"NIT_EMISOR\": \"8338817\",\n    \"NIT_RECEPTOR\": \"5123453\",\n    \"VALOR\": 250.00,\n    \"IVA\": 30.00,\n    \"TOTAL\": 280.00\n  }\n]"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/Autorizaciones/procesar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"Autorizaciones",
+						"procesar"
+					]
+				},
+				"description": "Procesa facturas con cálculo exacto de IVA (12%) y genera números de autorización diarios."
+			},
+			"response": []
+		},
+		{
+			"name": "4. Procesamiento de facturas con errores",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n  {\n    \"TIEMPO\": \"Guatemala, 02/04/2025 10:00 hrs.\",\n    \"REFERENCIA\": \"FAC-ERR-001\",\n    \"NIT_EMISOR\": \"7378106\",\n    \"NIT_RECEPTOR\": \"8338817\",\n    \"VALOR\": 100.00,\n    \"IVA\": 15.00,\n    \"TOTAL\": 115.00\n  },\n  {\n    \"TIEMPO\": \"Guatemala, 02/04/2025 10:30 hrs.\",\n    \"REFERENCIA\": \"FAC-VAL-001\",\n    \"NIT_EMISOR\": \"7378106\",\n    \"NIT_RECEPTOR\": \"8338817\",\n    \"VALOR\": 100.00,\n    \"IVA\": 12.00,\n    \"TOTAL\": 112.00\n  }\n]"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/Autorizaciones/procesar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"Autorizaciones",
+						"procesar"
+					]
+				},
+				"description": "Facturas con IVA mal calculado y con REFERENCIA duplicada para validar rechazos."
+			},
+			"response": []
+		},
+		{
+			"name": "5. Consulta de Resúmenes y Reportes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/ReporteRango?fechaInicio=01/04/2025&fechaFin=05/04/2025",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"ReporteRango"
+					],
+					"query": [
+						{
+							"key": "fechaInicio",
+							"value": "01/04/2025"
+						},
+						{
+							"key": "fechaFin",
+							"value": "05/04/2025"
+						}
+					]
+				},
+				"description": "Consulta el resumen por rango con auditoría detallada de errores (Pág. 3 del enunciado)."
+			},
+			"response": []
+		}
+	]
+}
