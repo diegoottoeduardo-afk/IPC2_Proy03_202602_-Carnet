@@ -10,6 +10,19 @@ namespace DteBackend.Controllers
     [Route("api/[controller]")]
     public class ReportesController : ControllerBase
     {
+        private static bool TryParseFecha(string fechaStr, out DateTime fecha)
+        {
+            fecha = DateTime.MinValue;
+            if (string.IsNullOrWhiteSpace(fechaStr))
+                return false;
+
+            string[] formatos = { "dd/MM/yyyy", "d/M/yyyy", "yyyy-MM-dd", "dd-MM-yyyy" };
+            if (DateTime.TryParseExact(fechaStr.Trim(), formatos, CultureInfo.InvariantCulture, DateTimeStyles.None, out fecha))
+                return true;
+
+            return DateTime.TryParse(fechaStr, new CultureInfo("es-GT"), DateTimeStyles.None, out fecha);
+        }
+
         // 1. Consultar Contribuyente (emitidas o recibidas en rango de fechas)
         [HttpGet("/ConsultaDatos")]
         [HttpGet("consultadatos")]
@@ -27,14 +40,11 @@ namespace DteBackend.Controllers
             DateTime fInicio = DateTime.MinValue;
             DateTime fFin = DateTime.MaxValue;
 
-            if (!string.IsNullOrWhiteSpace(fechaInicio))
-                DateTime.TryParse(fechaInicio, out fInicio);
+            if (TryParseFecha(fechaInicio, out var parsedInicio))
+                fInicio = parsedInicio;
 
-            if (!string.IsNullOrWhiteSpace(fechaFin))
-            {
-                if (DateTime.TryParse(fechaFin, out fFin))
-                    fFin = fFin.Date.AddDays(1).AddTicks(-1);
-            }
+            if (TryParseFecha(fechaFin, out var parsedFin))
+                fFin = parsedFin.Date.AddDays(1).AddTicks(-1);
 
             var query = DataStore.Facturas.Where(f => f.Aprobada);
 
@@ -88,12 +98,9 @@ namespace DteBackend.Controllers
         public IActionResult ResumenIva([FromQuery] string fecha)
         {
             DateTime fechaFiltro = DateTime.Today;
-            if (!string.IsNullOrWhiteSpace(fecha))
+            if (!TryParseFecha(fecha, out fechaFiltro))
             {
-                if (!DateTime.TryParse(fecha, out fechaFiltro))
-                {
-                    DateTime.TryParseExact(fecha, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out fechaFiltro);
-                }
+                fechaFiltro = DateTime.Today;
             }
 
             var facturasDelDia = DataStore.Facturas
@@ -144,14 +151,11 @@ namespace DteBackend.Controllers
             DateTime fInicio = DateTime.MinValue;
             DateTime fFin = DateTime.MaxValue;
 
-            if (!string.IsNullOrWhiteSpace(fechaInicio))
-                DateTime.TryParse(fechaInicio, out fInicio);
+            if (TryParseFecha(fechaInicio, out var parsedInicio))
+                fInicio = parsedInicio;
 
-            if (!string.IsNullOrWhiteSpace(fechaFin))
-            {
-                if (DateTime.TryParse(fechaFin, out fFin))
-                    fFin = fFin.Date.AddDays(1).AddTicks(-1);
-            }
+            if (TryParseFecha(fechaFin, out var parsedFin))
+                fFin = parsedFin.Date.AddDays(1).AddTicks(-1);
 
             var facturasRango = DataStore.Facturas
                 .Where(f => f.Aprobada && f.Fecha >= fInicio && f.Fecha <= fFin)
@@ -192,14 +196,11 @@ namespace DteBackend.Controllers
             DateTime fInicio = DateTime.MinValue;
             DateTime fFin = DateTime.MaxValue;
 
-            if (!string.IsNullOrWhiteSpace(fechaInicio))
-                DateTime.TryParse(fechaInicio, out fInicio);
+            if (TryParseFecha(fechaInicio, out var parsedInicio))
+                fInicio = parsedInicio;
 
-            if (!string.IsNullOrWhiteSpace(fechaFin))
-            {
-                if (DateTime.TryParse(fechaFin, out fFin))
-                    fFin = fFin.Date.AddDays(1).AddTicks(-1);
-            }
+            if (TryParseFecha(fechaFin, out var parsedFin))
+                fFin = parsedFin.Date.AddDays(1).AddTicks(-1);
 
             var facturasRango = DataStore.Facturas
                 .Where(f => f.Fecha >= fInicio && f.Fecha <= fFin)
@@ -248,43 +249,56 @@ namespace DteBackend.Controllers
                 "",
                 "1. ESTADISTICAS GENERALES:",
                 $"   Contribuyentes registrados en RTU: {DataStore.Contribuyentes.Count}",
-                $"   Facturas autorizadas (Aprobadas): {DataStore.Facturas.Count(f => f.Aprobada)}",
+                $"   Total facturas procesadas en historico: {DataStore.Facturas.Count}",
+                $"   Facturas aprobadas: {DataStore.Facturas.Count(f => f.Aprobada)}",
                 $"   Facturas rechazadas: {DataStore.Facturas.Count(f => !f.Aprobada)}",
-                $"   Monto total facturado (con IVA): Q {DataStore.Facturas.Where(f => f.Aprobada).Sum(f => f.Total):N2}",
+                $"   Monto total autorizado (Con IVA): Q {DataStore.Facturas.Where(f => f.Aprobada).Sum(f => f.Total):N2}",
+                $"   Monto total autorizado (Sin IVA): Q {DataStore.Facturas.Where(f => f.Aprobada).Sum(f => f.Valor):N2}",
                 $"   Total IVA recaudado: Q {DataStore.Facturas.Where(f => f.Aprobada).Sum(f => f.Iva):N2}",
                 "",
                 "--------------------------------------------------------------------------------",
-                "2. DETALLE DE FACTURAS AUTORIZADAS RECIENTES:",
-                "Fecha       | Referencia | Emisor    | Receptor  | Total (Q)   | No. Autorizacion",
+                "2. DETALLE DE ULTIMAS FACTURAS AUTORIZADAS:",
                 "--------------------------------------------------------------------------------"
             };
 
-            var aprobadas = DataStore.Facturas.Where(f => f.Aprobada).OrderByDescending(f => f.Fecha).Take(25).ToList();
-            if (aprobadas.Count == 0)
+            var ultimasAprobadas = DataStore.Facturas
+                .Where(f => f.Aprobada)
+                .OrderByDescending(f => f.Fecha)
+                .Take(25)
+                .ToList();
+
+            if (ultimasAprobadas.Count == 0)
             {
-                lineas.Add("No hay facturas aprobadas en el sistema.");
+                lineas.Add("   (No existen facturas autorizadas registradas actualmente)");
             }
             else
             {
-                foreach (var fac in aprobadas)
-                {
-                    string fStr = fac.Fecha.ToString("dd/MM/yyyy");
-                    string refStr = (fac.Referencia ?? "").PadRight(10).Substring(0, 10);
-                    string emStr = (fac.NitEmisor ?? "").PadRight(9).Substring(0, 9);
-                    string recStr = (fac.NitReceptor ?? "").PadRight(9).Substring(0, 9);
-                    string totStr = fac.Total.ToString("F2").PadLeft(11);
-                    string codStr = fac.CodigoAprobacion.ToString();
+                lineas.Add(string.Format("{0,-12} | {1,-10} | {2,-10} | {3,-10} | {4,-18}", 
+                    "Fecha", "Emisor", "Receptor", "Total (Q)", "Autorizacion"));
+                lineas.Add(new string('-', 76));
 
-                    lineas.Add($"{fStr}  | {refStr} | {emStr} | {recStr} | {totStr} | {codStr}");
+                foreach (var f in ultimasAprobadas)
+                {
+                    lineas.Add(string.Format("{0,-12} | {1,-10} | {2,-10} | {3,10:N2} | {4,-18}",
+                        f.Fecha.ToString("dd/MM/yyyy"),
+                        f.NitEmisor,
+                        f.NitReceptor,
+                        f.Total,
+                        f.CodigoAprobacion));
                 }
             }
 
+            lineas.Add("");
             lineas.Add("--------------------------------------------------------------------------------");
-            lineas.Add("Fin del reporte SAT - Sistema DTE IPC2.");
+            lineas.Add("Fin del reporte oficial - Superintendencia de Administracion Tributaria (SAT)");
+            lineas.Add("--------------------------------------------------------------------------------");
 
-            byte[] pdfBytes = PdfGenerator.GenerarPdf("SAT - SUPERINTENDENCIA DE ADMINISTRACION TRIBUTARIA", lineas);
+            byte[] pdfBytes = PdfGenerator.GenerarPdf(
+                "Superintendencia de Administracion Tributaria - SAT: Reporte DTE",
+                lineas
+            );
 
-            return File(pdfBytes, "application/pdf", $"Reporte_SAT_{DateTime.Now:yyyyMMdd_HHmm}.pdf");
+            return File(pdfBytes, "application/pdf", "Reporte_DTE_SAT.pdf");
         }
     }
 }
