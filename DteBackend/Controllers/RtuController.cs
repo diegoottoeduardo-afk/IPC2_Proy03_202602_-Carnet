@@ -10,6 +10,8 @@ namespace DteBackend.Controllers
     public class RtuController : ControllerBase
     {
         [HttpPost("actualizar")]
+        [HttpPost("/ActualizarRtu")]
+        [HttpPost("/api/actualizar")]
         public IActionResult ActualizarRtu([FromBody] List<Contribuyente> nuevosContribuyentes)
         {
             if (nuevosContribuyentes == null || nuevosContribuyentes.Count == 0)

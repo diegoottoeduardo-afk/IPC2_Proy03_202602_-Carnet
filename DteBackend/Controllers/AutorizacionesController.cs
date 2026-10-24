@@ -11,6 +11,8 @@ namespace DteBackend.Controllers
     public class AutorizacionesController : ControllerBase
     {
         [HttpPost("procesar")]
+        [HttpPost("/Procesar")]
+        [HttpPost("/api/procesar")]
         public IActionResult ProcesarFacturas([FromBody] List<SolicitudFactura> solicitudes)
         {
             if (solicitudes == null || solicitudes.Count == 0)
@@ -99,44 +101,49 @@ namespace DteBackend.Controllers
                     nuevaFactura.Aprobada = false;
                     nuevaFactura.Errores.Add("NIT emisor inválido");
                 }
+                else
+                {
+                    // Validar existencia en RTU solo si el NIT es sintácticamente válido
+                    bool emisorExiste = false;
+                    for (int i = 0; i < DataStore.Contribuyentes.Count; i++)
+                    {
+                        if (DataStore.Contribuyentes[i].NIT == sol.NIT_EMISOR)
+                        {
+                            emisorExiste = true;
+                            break;
+                        }
+                    }
+                    if (!emisorExiste)
+                    {
+                        nuevaFactura.Aprobada = false;
+                        nuevaFactura.Errores.Add("NIT emisor inexistente");
+                        rechazosEmisor++;
+                    }
+                }
 
                 if (!NitValidator.EsNitValido(sol.NIT_RECEPTOR))
                 {
                     nuevaFactura.Aprobada = false;
                     nuevaFactura.Errores.Add("NIT receptor inválido");
                 }
-
-                // Validar que existan en el RTU
-                bool emisorExiste = false;
-                for (int i = 0; i < DataStore.Contribuyentes.Count; i++)
+                else
                 {
-                    if (DataStore.Contribuyentes[i].NIT == sol.NIT_EMISOR)
+                    // Validar existencia en RTU solo si el NIT es sintácticamente válido
+                    bool receptorExiste = false;
+                    for (int i = 0; i < DataStore.Contribuyentes.Count; i++)
                     {
-                        emisorExiste = true;
-                        break;
+                        if (DataStore.Contribuyentes[i].NIT == sol.NIT_RECEPTOR)
+                        {
+                            receptorExiste = true;
+                            break;
+                        }
                     }
-                }
-                if (!emisorExiste)
-                {
-                    nuevaFactura.Aprobada = false;
-                    nuevaFactura.Errores.Add("NIT emisor inexistente");
-                    rechazosEmisor++;
-                }
-
-                bool receptorExiste = false;
-                for (int i = 0; i < DataStore.Contribuyentes.Count; i++)
-                {
-                    if (DataStore.Contribuyentes[i].NIT == sol.NIT_RECEPTOR)
+                    if (!receptorExiste)
                     {
-                        receptorExiste = true;
-                        break;
+                        nuevaFactura.Aprobada = false;
+                        nuevaFactura.Errores.Add("NIT receptor inexistente");
+                        rechazosReceptor++;
                     }
-                }
-                if (!receptorExiste)
-                {
-                    nuevaFactura.Aprobada = false;
-                    nuevaFactura.Errores.Add("NIT receptor inexistente");
-                    rechazosReceptor++;
                 }
 
                 // Validar cálculos (IVA = Redondear(Valor * 0.12, 2))

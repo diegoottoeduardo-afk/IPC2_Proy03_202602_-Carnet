@@ -9,23 +9,24 @@ namespace DteBackend.Utils
 
             nit = nit.Trim().ToUpper();
 
-            if (nit.Length < 2 || nit.Length > 20)
+            // Hasta 20 dígitos numéricos base + 1 dígito verificador = 21 máximo
+            if (nit.Length < 2 || nit.Length > 21)
                 return false;
 
             char digitoVerificador = nit[nit.Length - 1];
             string baseNit = nit.Substring(0, nit.Length - 1);
 
             int suma = 0;
-            int posicion = 1;
+            int factor = 2; // Inicia en 2 porque la posición 1 es el verificador que se exceptúa
 
             for (int i = baseNit.Length - 1; i >= 0; i--)
             {
                 if (!char.IsDigit(baseNit[i]))
                     return false;
 
-                int digito = int.Parse(baseNit[i].ToString());
-                suma += digito * posicion;
-                posicion++;
+                int digito = baseNit[i] - '0';
+                suma += digito * factor;
+                factor++;
             }
 
             // Paso 3: Módulo 11 de la sumatoria
@@ -37,15 +38,7 @@ namespace DteBackend.Utils
             // Paso 5: Módulo 11 del resultado del paso 4
             int resultado = resta % 11;
 
-            char esperado;
-            if (resultado == 10)
-            {
-                esperado = 'K';
-            }
-            else
-            {
-                esperado = resultado.ToString()[0];
-            }
+            char esperado = (resultado == 10) ? 'K' : (char)('0' + resultado);
 
             return digitoVerificador == esperado;
         }

@@ -8,6 +8,8 @@ namespace DteBackend.Controllers
     public class SistemaController : ControllerBase
     {
         [HttpPost("inicializar")]
+        [HttpPost("/Inicializar")]
+        [HttpPost("/api/inicializar")]
         public IActionResult Inicializar()
         {
             DataStore.Reiniciar();
